@@ -436,8 +436,19 @@ class MouseDown {
         }, 20);
       this.view.domObserver.start();
     }
+    /* 
+      * Plumsail fix
 
-    // CЮДА СМОТРИ ПРОБЛЕМА ЗДЕСЬ, ОБРАБОТЧИКИ НЕ ВЫЗЫВАЮТСЯ!!!!
+      * SharePoint code stop events propagations, so
+      * we have to add these eventHandlers to window
+      * with option capture:true 
+
+      Original code:
+      view.root.addEventListener('mouseup', (this.up = this.up.bind(this)));
+      view.root.addEventListener('mousemove', (this.move = this.move.bind(this)));
+
+      * Plumsail fix
+    */
     window.addEventListener('mouseup', (this.up = this.up.bind(this)), {
       capture: true,
     });
@@ -448,8 +459,21 @@ class MouseDown {
   }
 
   done() {
-    this.window.removeEventListener('mouseup', this.up, { capture: true });
-    this.window.removeEventListener('mousemove', this.move, { capture: true });
+    /* 
+      * Plumsail fix
+
+      * SharePoint code stop events propagations, so
+      * we have to remove these eventHandlers from window
+      * with option capture:true 
+
+      Original code:
+      this.view.root.addEventListener('mouseup', (this.up = this.up.bind(this)));
+      this.view.root.addEventListener('mousemove', (this.move = this.move.bind(this)));
+
+      * Plumsail fix
+    */
+    window.removeEventListener('mouseup', this.up, { capture: true });
+    window.removeEventListener('mousemove', this.move, { capture: true });
     if (this.mightDrag && this.target) {
       this.view.domObserver.stop();
       if (this.mightDrag.addAttr) this.target.removeAttribute('draggable');
@@ -461,7 +485,6 @@ class MouseDown {
   }
 
   up(event) {
-    console.log('MOUSEDOWN.UP EVENT HANDLER WORKS');
     this.done();
 
     if (
