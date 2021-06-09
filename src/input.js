@@ -437,14 +437,19 @@ class MouseDown {
       this.view.domObserver.start();
     }
 
-    view.root.addEventListener('mouseup', (this.up = this.up.bind(this)));
-    view.root.addEventListener('mousemove', (this.move = this.move.bind(this)));
+    // CЮДА СМОТРИ ПРОБЛЕМА ЗДЕСЬ, ОБРАБОТЧИКИ НЕ ВЫЗЫВАЮТСЯ!!!!
+    window.addEventListener('mouseup', (this.up = this.up.bind(this)), {
+      capture: true,
+    });
+    window.addEventListener('mousemove', (this.move = this.move.bind(this)), {
+      capture: true,
+    });
     setSelectionOrigin(view, 'pointer');
   }
 
   done() {
-    this.view.root.removeEventListener('mouseup', this.up);
-    this.view.root.removeEventListener('mousemove', this.move);
+    this.window.removeEventListener('mouseup', this.up, { capture: true });
+    this.window.removeEventListener('mousemove', this.move, { capture: true });
     if (this.mightDrag && this.target) {
       this.view.domObserver.stop();
       if (this.mightDrag.addAttr) this.target.removeAttribute('draggable');
@@ -456,6 +461,7 @@ class MouseDown {
   }
 
   up(event) {
+    console.log('MOUSEDOWN.UP EVENT HANDLER WORKS');
     this.done();
 
     if (
